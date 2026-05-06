@@ -34,14 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ name, email, password, type }),
             });
 
-            if (response.ok) {
-                alert('Registro bem-sucedido! Faça o login.');
-                showLogin.click(); // Volta para a tela de login
-                registerForm.reset();
-            } else {
-                const error = await response.json();
-                alert(`Erro no registro: ${error.detail}`);
-            }
+        if (response.ok) {
+            alert('Registro bem-sucedido!');
+        } else {
+            const error = await response.json();
+            alert(`Erro no registro: ${error.detail}`);
+        }
         } catch (error) {
             alert('Falha ao conectar com a API.');
             console.error('Erro no registro:', error);
