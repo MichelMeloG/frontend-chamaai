@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Registro - ChamaAí</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">ChamaAí</a>
+            <ul class="nav-links">
+                <li><a href="/#services">Serviços</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="form-container" id="auth-container">
+            <!-- Formulário de Login (inicialmente visível) -->
+            <form id="loginForm">
+                <h2>Login</h2>
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Senha" required>
+                <button type="submit">Entrar</button>
+                <p>Não tem uma conta? <a href="#" id="showRegister">Registre-se</a></p>
+            </form>
+
+            <!-- Formulário de Registro (inicialmente oculto) -->
+            <form id="registerForm" style="display: none;">
+                <h2>Criar Conta</h2>
+                <input type="text" id="registerName" placeholder="Nome Completo" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Senha" required>
+                <select id="registerType" required>
+                    <option value="" disabled selected>Você é...</option>
+                    <option value="client">Cliente</option>
+                    <option value="provider">Prestador de Serviço</option>
+                </select>
+                <button type="submit">Registrar</button>
+                <p>Já tem uma conta? <a href="#" id="showLogin">Faça Login</a></p>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ChamaAí. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="auth.js"></script>
+</body>
+</html>
