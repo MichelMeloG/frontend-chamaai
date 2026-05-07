@@ -7,29 +7,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <a href="/" class="logo">ChamaAí</a>
-            <ul class="nav-links" id="nav-links">
-                <!-- Links dinâmicos aqui -->
-            </ul>
-        </nav>
-    </header>
+    <div id="root"></div>
 
-    <main class="container">
-        <h1>Seu Painel</h1>
-        <div id="dashboard-content">
-            <!-- Conteúdo dinâmico do dashboard aqui -->
-            <p>Carregando suas informações...</p>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 ChamaAí. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <script src="app.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel" src="app.js"></script>
 </body>
 </html>
