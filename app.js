@@ -210,7 +210,7 @@ function Services({ user }) {
             description,
             status: 'novo',
             client_id: user.id,
-            professional_id: Number(form.professionalId.value),
+            professional_id: form.professionalId.value,
         };
 
         try {
@@ -337,7 +337,7 @@ function Dashboard({ user }) {
         const form = event.target;
         const payload = {
             sender_id: user.id,
-            receiver_id: Number(form.receiverId.value),
+            receiver_id: form.receiverId.value,
             content: form.content.value.trim(),
         };
         if (!payload.receiver_id || !payload.content) return;
@@ -405,7 +405,7 @@ function Dashboard({ user }) {
             <div className="card">
                 <h3>Mensagens</h3>
                 <form onSubmit={handleLoadConversation}>
-                    <input name="targetId" type="number" placeholder="ID do usuario" required />
+                    <input name="targetId" type="text" placeholder="ID do usuario" required />
                     <button type="submit">Carregar conversa</button>
                 </form>
                 {conversation.length > 0 && (
@@ -418,7 +418,7 @@ function Dashboard({ user }) {
                     </div>
                 )}
                 <form onSubmit={handleSendMessage}>
-                    <input name="receiverId" type="number" placeholder="ID do destinatario" required />
+                    <input name="receiverId" type="text" placeholder="ID do destinatario" required />
                     <input name="content" type="text" placeholder="Mensagem" required />
                     <button type="submit">Enviar</button>
                 </form>
