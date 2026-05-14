@@ -16,6 +16,24 @@ function apiFetch(path, options = {}) {
     return fetch(`${API_BASE}${path}`, { ...options, headers });
 }
 
+async function readErrorMessage(response, fallbackMessage) {
+    try {
+        const data = await response.json();
+        const detail = data?.detail;
+        if (!detail) return fallbackMessage;
+        if (typeof detail === 'string') return detail;
+        if (Array.isArray(detail)) {
+            return detail
+                .map((item) => (item && typeof item === 'object' ? item.msg || JSON.stringify(item) : String(item)))
+                .join(' | ');
+        }
+        if (typeof detail === 'object') return detail.msg || JSON.stringify(detail);
+        return String(detail);
+    } catch (error) {
+        return fallbackMessage;
+    }
+}
+
 function useHashRoute() {
     const getRoute = () => {
         const hash = window.location.hash.replace('#', '');
@@ -112,6 +130,7 @@ function LoginRegister({ onLogin }) {
         const payload = {
             name: form.name.value.trim(),
             email: form.email.value.trim(),
+            cpf: form.cpf.value.trim(),
             password: form.password.value,
             type: form.type.value,
         };
@@ -123,8 +142,8 @@ function LoginRegister({ onLogin }) {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                setMessage(error.detail || 'Erro ao registrar.');
+                const errorMessage = await readErrorMessage(response, 'Erro ao registrar.');
+                setMessage(errorMessage);
                 return;
             }
 
@@ -144,6 +163,7 @@ function LoginRegister({ onLogin }) {
                     <form onSubmit={handleRegister}>
                         <input name="name" type="text" placeholder="Nome completo" required />
                         <input name="email" type="email" placeholder="Email" required />
+                        <input name="cpf" type="text" placeholder="CPF" required />
                         <input name="password" type="password" placeholder="Senha" required />
                         <select name="type" required defaultValue="">
                             <option value="" disabled>Voce e...</option>
@@ -220,8 +240,8 @@ function Services({ user }) {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                setMessage(error.detail || 'Falha ao criar solicitacao.');
+                const errorMessage = await readErrorMessage(response, 'Falha ao criar solicitacao.');
+                setMessage(errorMessage);
                 return;
             }
 
@@ -310,8 +330,8 @@ function Dashboard({ user }) {
                 body: JSON.stringify(payload),
             });
             if (!response.ok) {
-                const error = await response.json();
-                setMessage(error.detail || 'Falha ao criar servico.');
+                const errorMessage = await readErrorMessage(response, 'Falha ao criar servico.');
+                setMessage(errorMessage);
                 return;
             }
             setMessage('Servico criado.');
@@ -348,8 +368,8 @@ function Dashboard({ user }) {
                 body: JSON.stringify(payload),
             });
             if (!response.ok) {
-                const error = await response.json();
-                setMessage(error.detail || 'Falha ao enviar mensagem.');
+                const errorMessage = await readErrorMessage(response, 'Falha ao enviar mensagem.');
+                setMessage(errorMessage);
                 return;
             }
             form.reset();
@@ -467,8 +487,8 @@ function Profile({ user, onProfileUpdate }) {
                   });
 
             if (!response.ok) {
-                const error = await response.json();
-                setMessage(error.detail || 'Falha ao salvar perfil.');
+                const errorMessage = await readErrorMessage(response, 'Falha ao salvar perfil.');
+                setMessage(errorMessage);
                 return;
             }
 
