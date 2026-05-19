@@ -1,0 +1,5 @@
+export { Dashboard } from './Dashboard'
+export { Home } from './Home'
+export { LoginRegister } from './LoginRegister'
+export { Profile } from './Profile'
+export { Services } from './Services'
