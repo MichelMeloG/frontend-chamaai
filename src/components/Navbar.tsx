@@ -10,13 +10,13 @@ export function Navbar({
 }) {
   return (
     <header>
-      <nav className="container nav">
+      <nav className="nav">
         <Link className="logo" to="/">
-          ChamaAi
+          🔵 ObraLink
         </Link>
         <div className="nav-links">
-          <Link to="/">Inicio</Link>
-          <Link to="/services">Servicos</Link>
+          <Link to="/">Início</Link>
+          <Link to="/services">Serviços</Link>
           {user ? (
             <>
               <Link to="/dashboard">Dashboard</Link>
