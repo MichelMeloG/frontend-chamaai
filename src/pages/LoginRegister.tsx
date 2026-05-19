@@ -2,20 +2,17 @@ import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { API_BASE, apiFetch, readErrorMessage } from '../api'
+import './LoginRegister.css'
 
 export function LoginRegister({
   onLogin,
 }: {
   onLogin: () => Promise<void>
 }) {
-  const [isRegister, setIsRegister] = useState(false)
+  const [isRegister, setIsRegister] = useState(true)
   const [message, setMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
-
-  const toggle = () => {
-    setMessage('')
-    setIsRegister((prev) => !prev)
-  }
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -85,35 +82,101 @@ export function LoginRegister({
   }
 
   return (
-    <section className="container">
-      <div className="card">
-        <h2>{isRegister ? 'Criar Conta' : 'Login'}</h2>
+    <section className="login-container">
+      <div className="login-card">
+        {/* Title */}
+        <h2 className="login-title">{isRegister ? 'Crie sua conta' : 'Login'}</h2>
+        <p className="login-subtitle">
+          {isRegister
+            ? 'Cadastre-se e encontre os melhores profissionais'
+            : 'Entre com seus dados para acessar'}
+        </p>
+
+        {/* Tabs */}
+        <div className="login-tabs">
+          <button
+            type="button"
+            className={`tab ${!isRegister ? 'active' : ''}`}
+            onClick={() => {
+              setIsRegister(false)
+              setMessage('')
+            }}
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            className={`tab ${isRegister ? 'active' : ''}`}
+            onClick={() => {
+              setIsRegister(true)
+              setMessage('')
+            }}
+          >
+            Cadastrar
+          </button>
+        </div>
+
+        {/* Message */}
         {message && <p className="message">{message}</p>}
+
+        {/* Forms */}
         {isRegister ? (
-          <form onSubmit={handleRegister}>
-            <input name="name" type="text" placeholder="Nome completo" required />
-            <input name="email" type="email" placeholder="Email" required />
+          <form onSubmit={handleRegister} className="login-form">
+            <input name="name" type="text" placeholder="Nome" required />
+            <input name="email" type="email" placeholder="E-mail" required />
             <input name="cpf" type="text" placeholder="CPF" required />
-            <input name="password" type="password" placeholder="Senha" required />
+            <div className="password-input">
+              <input
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Senha"
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
             <select name="type" required defaultValue="">
               <option value="" disabled>
-                Voce e...
+                Você é...
               </option>
               <option value="client">Cliente</option>
               <option value="provider">Prestador</option>
             </select>
-            <button type="submit">Registrar</button>
-            <button type="button" className="secondary" onClick={toggle}>
-              Ja tem conta? Login
+            <button type="submit" className="primary-button">
+              Criar conta
             </button>
           </form>
         ) : (
-          <form onSubmit={handleLogin}>
-            <input name="email" type="email" placeholder="Email" required />
-            <input name="password" type="password" placeholder="Senha" required />
-            <button type="submit">Entrar</button>
-            <button type="button" className="secondary" onClick={toggle}>
-              Criar conta
+          <form onSubmit={handleLogin} className="login-form">
+            <input name="email" type="email" placeholder="E-mail" required />
+            <div className="password-input">
+              <input
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Senha"
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
+            <button type="submit" className="primary-button">
+              Entrar
             </button>
           </form>
         )}

@@ -1,163 +1,154 @@
-import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
-import { apiFetch, readErrorMessage } from '../api'
-import type { MessageItem, RequestItem, User } from '../types'
+import { apiFetch } from '../api'
+import type { User } from '../types'
+import './Dashboard.css'
+
+interface Contact {
+  id: number
+  name: string
+  message: string
+  time: string
+  avatar?: string
+}
 
 export function Dashboard({ user }: { user: User | null }) {
-  const [requests, setRequests] = useState<RequestItem[]>([])
-  const [message, setMessage] = useState('')
+  const [isAvailable, setIsAvailable] = useState(true)
   const [loading, setLoading] = useState(true)
-  const [conversation, setConversation] = useState<MessageItem[]>([])
+  const [error, setError] = useState('')
+  const [contacts, setContacts] = useState<Contact[]>([])
 
   useEffect(() => {
-    if (!user) return
-    const endpoint =
-      user.type === 'provider'
-        ? `/requests/professional/${user.id}`
-        : `/requests/client/${user.id}`
-    apiFetch(endpoint)
-      .then((response) => response.json())
-      .then((data: RequestItem[]) => setRequests(data || []))
-      .catch(() => setMessage('Nao foi possivel carregar solicitacoes.'))
-      .finally(() => setLoading(false))
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
+    const loadDashboardData = async () => {
+      try {
+        // Carregar contatos/mensagens
+        const response = await apiFetch(`/messages/${user.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          setContacts(data || [])
+        }
+      } catch (err) {
+        setError('Erro ao carregar dados do dashboard')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadDashboardData()
   }, [user])
-
-  const handleCreateService = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!user || user.type !== 'provider') return
-    const form = event.currentTarget
-    const formData = new FormData(form)
-    const payload = {
-      title: String(formData.get('title') || '').trim(),
-      description: String(formData.get('description') || '').trim(),
-      price: Number(formData.get('price') || 0),
-      user_id: user.id,
-    }
-
-    try {
-      const response = await apiFetch('/services/', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-      if (!response.ok) {
-        const errorMessage = await readErrorMessage(response, 'Falha ao criar servico.')
-        setMessage(errorMessage)
-        return
-      }
-      setMessage('Servico criado.')
-      form.reset()
-    } catch (error) {
-      setMessage('Falha ao conectar com a API.')
-    }
-  }
-
-  const handleLoadConversation = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!user) return
-    const formData = new FormData(event.currentTarget)
-    const targetId = String(formData.get('targetId') || '').trim()
-    if (!targetId) return
-    const response = await apiFetch(`/messages/${user.id}/${targetId}`)
-    const data = (await response.json()) as MessageItem[]
-    setConversation(data || [])
-  }
-
-  const handleSendMessage = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!user) return
-    const form = event.currentTarget
-    const formData = new FormData(form)
-    const payload = {
-      sender_id: user.id,
-      receiver_id: String(formData.get('receiverId') || ''),
-      content: String(formData.get('content') || '').trim(),
-    }
-    if (!payload.receiver_id || !payload.content) return
-
-    try {
-      const response = await apiFetch('/messages/', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      })
-      if (!response.ok) {
-        const errorMessage = await readErrorMessage(response, 'Falha ao enviar mensagem.')
-        setMessage(errorMessage)
-        return
-      }
-      form.reset()
-      setMessage('Mensagem enviada.')
-    } catch (error) {
-      setMessage('Falha ao conectar com a API.')
-    }
-  }
 
   if (!user) {
     return (
       <section className="container">
-        <p>Voce precisa estar logado para ver o dashboard.</p>
+        <p>Você precisa estar logado para ver o dashboard.</p>
       </section>
     )
   }
 
+  const stats = [
+    { label: 'Visitas ao perfil', value: '45', change: '+12%', icon: '👁️' },
+    { label: 'Contatos recebidos', value: `${contacts.length}`, change: '+3', icon: '💬' },
+    { label: 'Nota média', value: '4.9', change: '127 avaliações', icon: '⭐' },
+    { label: 'Receita estimada', value: 'R$2.4k', change: 'este mês', icon: '📈' },
+  ]
+
   return (
-    <section className="container" id="dashboard">
-      <h2>Dashboard</h2>
-      <p>Ola, {user.name}</p>
-      {message && <p className="message">{message}</p>}
-
-      {user.type === 'provider' && (
-        <div className="card">
-          <h3>Criar servico</h3>
-          <form onSubmit={handleCreateService}>
-            <input name="title" type="text" placeholder="Titulo" required />
-            <textarea name="description" placeholder="Descricao" rows={3} required></textarea>
-            <input name="price" type="number" step="0.01" placeholder="Preco" required />
-            <button type="submit">Salvar</button>
-          </form>
-        </div>
-      )}
-
-      <div className="card">
-        <h3>Solicitacoes</h3>
-        {loading ? (
-          <p>Carregando...</p>
-        ) : (
-          <ul className="list">
-            {requests.length === 0 && <li>Nenhuma solicitacao.</li>}
-            {requests.map((item) => (
-              <li key={item.id}>
-                <strong>Status:</strong> {item.status} <br />
-                <span>{item.description}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="card">
-        <h3>Mensagens</h3>
-        <form onSubmit={handleLoadConversation}>
-          <input name="targetId" type="text" placeholder="ID do usuario" required />
-          <button type="submit">Carregar conversa</button>
-        </form>
-        {conversation.length > 0 && (
-          <div className="chat">
-            {conversation.map((msg) => (
-              <div
-                key={msg.id}
-                className={msg.sender_id === user.id ? 'chat-me' : 'chat-them'}
-              >
-                <span>{msg.content}</span>
-              </div>
-            ))}
+    <div className="dashboard-layout">
+      <aside className="dashboard-sidebar">
+        <div className="sidebar-menu">
+          <div className="menu-item active">
+            <span className="menu-icon">🏠</span>
+            <span>Início</span>
           </div>
-        )}
-        <form onSubmit={handleSendMessage}>
-          <input name="receiverId" type="text" placeholder="ID do destinatario" required />
-          <input name="content" type="text" placeholder="Mensagem" required />
-          <button type="submit">Enviar</button>
-        </form>
-      </div>
-    </section>
+          <div className="menu-item">
+            <span className="menu-icon">💬</span>
+            <span>Mensagens</span>
+          </div>
+          <div className="menu-item">
+            <span className="menu-icon">📊</span>
+            <span>Dashboard</span>
+          </div>
+          <div className="menu-item">
+            <span className="menu-icon">🔍</span>
+            <span>Buscar Profissionais</span>
+          </div>
+        </div>
+      </aside>
+
+      <section className="dashboard-main">
+        {/* Premium Banner */}
+        <div className="premium-banner">
+          <div className="banner-content">
+            <h3>Plano anual Gratuito</h3>
+            <p>Quer aparecer 3x mais?</p>
+            <p className="banner-subtitle">
+              Com o Plano Premium, seu perfil aparece primeiro nas buscas e você recebe mais contatos!
+            </p>
+            <button className="banner-button">⭐ Conheça o Plano Premium</button>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="stats-grid">
+          {stats.map((stat) => (
+            <div key={stat.label} className="stat-card">
+              <div className="stat-icon">{stat.icon}</div>
+              <div className="stat-value">{stat.value}</div>
+              <div className="stat-label">{stat.label}</div>
+              <div className="stat-change">{stat.change}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Status Section */}
+        <div className="status-section">
+          <div className="status-indicator">
+            <div className="status-dot"></div>
+            <span>Status: {isAvailable ? 'Disponível' : 'Indisponível'}</span>
+          </div>
+          <button
+            className="status-toggle"
+            onClick={() => setIsAvailable(!isAvailable)}
+          >
+            Alterar
+          </button>
+        </div>
+
+        {/* My Contacts Section */}
+        <div className="contacts-section">
+          <h3>Meus Contatos</h3>
+          <a href="#" className="view-all">Ver todos ›</a>
+          <div className="contacts-list">
+            {loading ? (
+              <p>Carregando contatos...</p>
+            ) : error ? (
+              <p style={{ color: '#dc2626' }}>{error}</p>
+            ) : contacts.length === 0 ? (
+              <p>Nenhum contato ainda</p>
+            ) : (
+              contacts.map((contact) => (
+                <div key={contact.id} className="contact-item">
+                  {contact.avatar ? (
+                    <img src={contact.avatar} alt={contact.name} />
+                  ) : (
+                    <div className="contact-avatar">{contact.name.charAt(0)}</div>
+                  )}
+                  <div className="contact-info">
+                    <div className="contact-name">{contact.name}</div>
+                    <div className="contact-message">{contact.message}</div>
+                  </div>
+                  <div className="contact-time">{contact.time}</div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }
