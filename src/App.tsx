@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { apiFetch } from './api'
 import { Navbar } from './components/Navbar'
 import { Dashboard, Home, LoginRegister, Profile, Services } from './pages'
@@ -9,6 +9,8 @@ function App() {
   const [user, setUser] = useState<User | null>(null)
   const [loadingUser, setLoadingUser] = useState(true)
   const navigate = useNavigate()
+  const location = useLocation()
+  const isServicesPage = location.pathname === '/services'
 
   const refreshUser = async () => {
     const token = localStorage.getItem('accessToken')
@@ -50,7 +52,7 @@ function App() {
 
   return (
     <>
-      <Navbar user={user} onLogout={handleLogout} />
+      {!isServicesPage && <Navbar user={user} onLogout={handleLogout} />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services user={user} />} />
@@ -59,7 +61,7 @@ function App() {
         <Route path="/profile" element={<Profile user={user} onProfileUpdate={refreshUser} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <footer className="container footer">&copy; 2026 ChamaAi</footer>
+      {!isServicesPage && <footer className="container footer">&copy; 2026 ChamaAi</footer>}
     </>
   )
 }
