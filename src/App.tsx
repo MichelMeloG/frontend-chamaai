@@ -10,7 +10,7 @@ function App() {
   const [loadingUser, setLoadingUser] = useState(true)
   const navigate = useNavigate()
   const location = useLocation()
-  const isServicesPage = location.pathname === '/services'
+  const isAppShell = location.pathname === '/services' || location.pathname === '/dashboard'
 
   const refreshUser = async () => {
     const token = localStorage.getItem('accessToken')
@@ -52,7 +52,7 @@ function App() {
 
   return (
     <>
-      {!isServicesPage && <Navbar user={user} onLogout={handleLogout} />}
+      {!isAppShell && <Navbar user={user} onLogout={handleLogout} />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services user={user} />} />
@@ -61,7 +61,7 @@ function App() {
         <Route path="/profile" element={<Profile user={user} onProfileUpdate={refreshUser} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      {!isServicesPage && <footer className="container footer">&copy; 2026 ChamaAi</footer>}
+      {!isAppShell && <footer className="container footer">&copy; 2026 ChamaAi</footer>}
     </>
   )
 }

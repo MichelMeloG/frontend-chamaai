@@ -158,9 +158,8 @@ export function Services({ user }: { user: User | null }) {
                 <button
                   key={cat.label}
                   type="button"
-                  className="category-card"
+                  className={`category-card ${isSelected ? 'active' : ''}`}
                   onClick={() => setSelectedCategory(isSelected ? null : cat.label)}
-                  style={isSelected ? { borderColor: 'var(--primary)', background: 'var(--primary-ghost)' } : {}}
                 >
                   <span className="category-icon">{cat.icon}</span>
                   <span>{cat.label}</span>

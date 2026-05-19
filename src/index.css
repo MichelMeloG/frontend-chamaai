@@ -451,9 +451,9 @@ li {
 }
 
 .tab.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: var(--shadow);
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .section-head {
@@ -488,7 +488,7 @@ li {
   width: auto;
   flex: 1;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .category-card:hover {
@@ -496,6 +496,11 @@ li {
   box-shadow: var(--shadow);
 }
 
+.category-card.active {
+  background: #5cb85c;
+  border-color: #5cb85c;
+  color: white;
+}
 
 .category-icon {
   width: 42px;
@@ -506,6 +511,11 @@ li {
   display: grid;
   place-items: center;
   font-size: 16px;
+}
+
+.category-card.active .category-icon {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
 .pro-grid {
